@@ -3,7 +3,7 @@ import os
 import re
 import time
 
-from notion_client import Client
+from notion_client import APIResponseError, Client
 from retrying import retry
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -364,8 +364,10 @@ class NotionHelper:
 
     @retry(stop_max_attempt_number=3, wait_fixed=5000)
     def delete_block(self, block_id):
-        return self.client.blocks.delete(block_id=block_id)
-
+        try:
+            return self.client.blocks.delete(block_id=block_id)
+        except APIResponseError as error:
+            print(error)
     @retry(stop_max_attempt_number=3, wait_fixed=5000)
     def get_all_book(self):
         """从Notion中获取所有的书籍"""
